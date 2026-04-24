@@ -1,0 +1,348 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Muffin AI — Meeting Log</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT,WONK@9..144,300..800,0..100,0..1&family=Inter+Tight:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #faf7f2;
+    --bg-card: #ffffff;
+    --bg-subtle: #f3eee5;
+    --ink: #1f1d19;
+    --ink-dim: #6b6558;
+    --ink-faint: #9a9382;
+    --line: #e8e1d3;
+    --line-strong: #d8cfbc;
+    --primary: #e76f1a;
+    --primary-soft: #fdecd9;
+    --primary-dim: #b85512;
+    --radius: 6px;
+  }
+  *,*::before,*::after{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:'Inter Tight',system-ui,sans-serif;
+    background:var(--bg);color:var(--ink);
+    font-size:15px;line-height:1.55;min-height:100vh;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:860px;margin:0 auto;padding:56px 28px 120px}
+
+  header{margin-bottom:48px}
+  .kicker{
+    font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.18em;
+    color:var(--primary);text-transform:uppercase;margin-bottom:10px;
+  }
+  h1{
+    font-family:'Fraunces',serif;font-weight:400;
+    font-variation-settings:"SOFT" 40,"WONK" 1,"opsz" 120;
+    font-size:clamp(40px,6vw,60px);line-height:1;letter-spacing:-0.02em;
+    margin:0 0 14px;
+  }
+  h1 em{font-style:italic;color:var(--primary);font-variation-settings:"SOFT" 80,"WONK" 1}
+  .subtitle{
+    color:var(--ink-dim);font-size:15px;margin:0;max-width:620px;
+  }
+  .last-update{
+    font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ink-faint);
+    margin-top:20px;
+  }
+
+  .timeline{position:relative;padding-left:28px}
+  .timeline::before{
+    content:'';position:absolute;left:6px;top:14px;bottom:14px;
+    width:1px;background:var(--line-strong);
+  }
+  .session{position:relative;margin-bottom:20px}
+  .session::before{
+    content:'';position:absolute;left:-28px;top:26px;
+    width:11px;height:11px;border-radius:50%;
+    background:var(--bg);border:2px solid var(--line-strong);
+    transition:all 0.2s;
+  }
+  .session.latest::before{
+    background:var(--primary);border-color:var(--primary);
+    box-shadow:0 0 0 4px var(--primary-soft);
+  }
+
+  details.card{
+    background:var(--bg-card);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    overflow:hidden;
+    transition:border-color 0.2s,box-shadow 0.2s;
+  }
+  details.card:hover{border-color:var(--line-strong)}
+  details.card[open]{
+    border-color:var(--primary);
+    box-shadow:0 4px 20px -8px rgba(231,111,26,0.18);
+  }
+  summary{
+    list-style:none;cursor:pointer;padding:18px 22px;
+    display:flex;gap:18px;align-items:flex-start;
+  }
+  summary::-webkit-details-marker{display:none}
+  .date{
+    font-family:'JetBrains Mono',monospace;font-size:11px;
+    color:var(--ink-faint);letter-spacing:0.03em;
+    flex-shrink:0;width:74px;padding-top:4px;
+  }
+  .head{flex:1;min-width:0}
+  .title{
+    font-family:'Fraunces',serif;font-size:19px;font-weight:400;
+    letter-spacing:-0.01em;line-height:1.3;
+  }
+  .sub{
+    color:var(--ink-dim);font-size:13px;margin-top:3px;
+  }
+  .chev{
+    font-family:'JetBrains Mono',monospace;color:var(--ink-faint);
+    transition:transform 0.2s,color 0.2s;padding-top:4px;
+    flex-shrink:0;
+  }
+  details[open] .chev{transform:rotate(90deg);color:var(--primary)}
+
+  .body{
+    padding:4px 22px 24px;border-top:1px solid var(--line);margin-top:6px;
+  }
+  .lead{
+    font-family:'Fraunces',serif;font-size:16px;line-height:1.55;
+    color:var(--ink);margin:18px 0 0;padding:14px 18px;
+    background:var(--primary-soft);border-radius:var(--radius);
+    border-left:3px solid var(--primary);
+    font-style:italic;
+  }
+  .section{margin-top:22px}
+  .section h4{
+    font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.2em;
+    color:var(--ink-faint);text-transform:uppercase;font-weight:500;
+    margin:0 0 10px;
+  }
+  .section ul{margin:0;padding:0;list-style:none}
+  .section li{
+    position:relative;padding:8px 0 8px 20px;
+    font-size:14px;line-height:1.5;border-bottom:1px dashed var(--line);
+  }
+  .section li:last-child{border-bottom:none}
+  .section li::before{
+    content:'';position:absolute;left:0;top:17px;
+    width:8px;height:1px;background:var(--primary);
+  }
+  .section li b{color:var(--primary-dim);font-weight:500}
+  .section li code{
+    font-family:'JetBrains Mono',monospace;font-size:12px;
+    background:var(--bg-subtle);padding:1px 6px;border-radius:3px;color:var(--ink);
+  }
+
+  .placeholder{
+    padding:18px;border:1px dashed var(--line-strong);border-radius:var(--radius);
+    color:var(--ink-dim);font-size:13.5px;text-align:center;margin-top:18px;
+    background:var(--bg-subtle);
+  }
+
+  .recording{
+    margin-top:18px;padding:12px 16px;
+    background:var(--bg-subtle);border-radius:var(--radius);
+    display:flex;align-items:center;gap:12px;
+    font-size:13px;
+  }
+  .recording-label{
+    font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.15em;
+    color:var(--ink-faint);text-transform:uppercase;
+  }
+  .recording a{
+    color:var(--primary);text-decoration:none;font-weight:500;
+    display:inline-flex;align-items:center;gap:6px;
+  }
+  .recording a:hover{text-decoration:underline}
+  .recording a::after{
+    content:'↗';font-size:11px;opacity:0.7;
+  }
+
+  footer{
+    margin-top:64px;padding-top:20px;border-top:1px solid var(--line);
+    font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ink-faint);
+  }
+  footer code{color:var(--primary)}
+
+  @media (max-width:620px){
+    .wrap{padding:36px 18px 80px}
+    summary{flex-direction:column;gap:6px}
+    .date{width:auto;padding-top:0}
+    .chev{display:none}
+    .timeline{padding-left:22px}
+    .session::before{left:-22px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="kicker">Muffin × Exodia</div>
+    <h1>Muffin <em>AI</em> — Meeting Log</h1>
+    <p class="subtitle">Registro degli allineamenti svolti, con il quadro emerso e le decisioni prese in ciascuna sessione.</p>
+    <div class="last-update" id="last-update"></div>
+  </header>
+
+  <div class="timeline" id="timeline"></div>
+
+  <footer>
+    <span>Aggiornato manualmente · edita <code>SESSIONS</code> in fondo al file HTML</span>
+  </footer>
+</div>
+
+<script>
+/* ============================================================
+   SESSIONS — una entry per meeting, dal più recente al più vecchio
+   ============================================================ */
+const LAST_UPDATE = "2026-04-24";
+
+const SESSIONS = [
+  {
+    date: "2026-04-24",
+    title: "Allineamento Tecnico Infrastruttura",
+    subtitle: "Pre-ingaggio FastWeb",
+    latest: true,
+    placeholder: "Sessione in corso. Contenuti in arrivo al termine della chiamata.",
+  },
+
+  {
+    date: "2026-04-16",
+    title: "Sprint Review · D2",
+    subtitle: "Ingestion full-fledged + OCR + UI v0",
+    recording: "https://app.read.ai/analytics/meetings/01KPB5G5ZDJP4EV1A46AHXNBH9?utm_source=Share_CopyLink",
+    summary: "Secondo deliverable chiuso. Pipeline di ingestion completa con OCR (AWS Textract) e chunk con citazioni tracciabili fino alle coordinate del PDF. Designer ha prodotto il prototipo v0 della dashboard, integrazione front-back parte da D3.",
+    quadro: [
+      "Pipeline end-to-end stabile su AWS Exodia: scraping → S3 → OCR → chunking → Qdrant.",
+      "Chunk con <b>bounding box</b> sia a livello di sezione sia di singola riga → il frontend può zoomare sulla citazione esatta nel PDF.",
+      "UX chatbot disegnata come <b>floating bar</b> persistente e contestuale: se l'utente è su un bando specifico, il LLM riceve in automatico il grant ID come contesto.",
+      "Luca ha evidenziato interesse a portare la feature \"ask about a grant\" anche nel prodotto Muffin core, oltre che nella dashboard interna.",
+    ],
+    decisioni: [
+      "<b>OCR</b>: scelto <code>AWS Textract</code> per coerenza con lo stack AWS di produzione.",
+      "<b>Design system</b>: confermato <code>shadcn/ui</code>, stesso del team prodotto Muffin.",
+      "<b>Terminologia</b>: usare <i>bandi</i>, non <i>finanziamenti</i>.",
+      "<b>FastWeb</b>: pre-allineamento interno Muffin+Exodia entro fine aprile, poi contatto FastWeb.",
+      "Chunking a <b>~700 token</b> con source line mapping page-by-page.",
+    ],
+  },
+
+  {
+    date: "2026-04-01",
+    title: "Sprint Review · D1",
+    subtitle: "Qdrant deployment & pipeline v0",
+    recording: "https://app.read.ai/analytics/meetings/01KN4FTZV5YC9BYJB4NCGX3Z02?utm_source=Share_CopyLink",
+    summary: "Primo deliverable consegnato secondo roadmap. Pipeline end-to-end funzionante su infra Exodia: scraping → data lake → vectorization → Qdrant. Handoff FastWeb ancora differito a fine aprile.",
+    quadro: [
+      "50 bandi processati dal dump storico (su 581 attivi, 3.601 totali).",
+      "650 file scaricati (PDF, testo, Word) — ~10 asset per bando.",
+      "13.500 chunk vettoriali in Qdrant con metadata per filtering focalizzato (job ID, grant ID, source file).",
+      "Dump Muffin da solo non è sufficiente: contiene summary già sintetizzate, lo scraping dei siti ufficiali resta necessario.",
+      "Ispirazione UX per il prodotto Muffin: modello Perplexity con <i>contextualization + source citation</i> nella risposta LLM.",
+    ],
+    decisioni: [
+      "<b>Embedding model</b>: <code>Gemini Embedding 1</code> dopo benchmark interno — performance superiore su italiano.",
+      "<b>Archivio chunk</b> separato dal vector DB, per consentire re-vectorization senza re-scraping.",
+      "<b>Job-based architecture</b>: ogni ingestione tracciata con job ID per debug e monitoring.",
+      "<b>ID univoco bandi</b>: da concordare con Muffin schema permanente per i nuovi bandi.",
+      "<b>FastWeb</b>: trasferimento infra posticipato a fine aprile, con istruzioni complete + meeting di allineamento.",
+    ],
+  },
+
+  {
+    date: "2026-03-18",
+    title: "Allineamento Centro Studi",
+    subtitle: "EXODIA × Muffin × CS (Vanessa, Elisa, Sebastiano)",
+    recording: "https://app.read.ai/analytics/meetings/01KM0GV879B88XK7PXMF46J5G0?utm_source=Share_CopyLink",
+    summary: "Sessione per capire come il Centro Studi lavora oggi e dove l'AI può togliere attrito. Emersi i casi d'uso principali, i criteri di selezione dei bandi e le sfumature normative che impongono un modello human-in-the-loop.",
+    quadro: [
+      "Casi d'uso prioritari: (1) <b>ricerca per progetto</b> — utente ha un investimento pianificato, il sistema trova bandi coerenti; (2) <b>Q&A su bando specifico</b>; (3) ricerca generica (minore).",
+      "<b>Accumulabilità</b> è la domanda più frequente e meno standardizzabile — dipende caso per caso dalla norma.",
+      "CS scrive regolarmente a enti via email ordinaria: le risposte <i>non</i> hanno valenza legale, ma alimentano la knowledge base interna.",
+      "Picchi di carico: gennaio-maggio (bandi agricoli), 20-40 bandi/giorno in periodi critici.",
+      "Molti bandi hanno <b>doppio link ufficiale</b> (ente promulgatore + ente gestore): oggi il back-office Muffin ne accetta solo uno.",
+      "Aggiornamenti normativi spesso arrivano via PDF separato con rimandi ad articoli (es. \"art. 5.1 lett. B\") — il diff automatico richiede sempre validazione umana.",
+    ],
+    decisioni: [
+      "<b>Ruolo CS</b>: validator umano nel loop, non bottleneck. L'AI propone, il CS approva.",
+      "<b>Cadenza check automatico</b>: default ogni 2 settimane + trigger manuale per bandi prioritari.",
+      "<b>Multi-link per bando</b>: richiesta prodotto da aprire su Muffin per supportare più fonti ufficiali.",
+      "<b>Chatbot per-bando</b>: posticipato a fase 3, dopo la base dati vettorializzata completa.",
+      "<b>Criteri di scarto bandi</b>: PA, terzo settore, europei (non gestiti oggi).",
+    ],
+  },
+
+  {
+    date: "2026-03-09",
+    title: "Kickoff & Infrastructure",
+    subtitle: "EXODIA × Muffin",
+    recording: "https://app.read.ai/analytics/meetings/01KK9C7JKPYP2H4NBBWDXHZMD2?utm_source=Share_CopyLink",
+    summary: "Fondamenta tecniche e organizzative del progetto. Scelta chiave: partire dalla sola ingestion (\"blue scope\"), senza assorbire responsabilità di prodotto sulla summarization — che resta in capo al Centro Studi.",
+    quadro: [
+      "SQL dump fornito da Muffin è datato (agosto); alcune strutture sono cambiate (split expenditures in primary/secondary).",
+      "Discussi due scope possibili: <b>blue</b> (solo ingestion, AI fornisce dati) vs <b>yellow</b> (AI possiede anche summarization e regole di bando).",
+      "FastWeb opera tipicamente a giornate/uomo con iterazione limitata → preferito iterare prima su AWS Exodia, poi consegnare infra pronta a FastWeb.",
+      "Terraform già pronto lato Exodia: deploy ambiente completo in ~15-20 minuti.",
+    ],
+    decisioni: [
+      "<b>Scope iniziale</b>: <i>blue</i>. Il servizio AI gestisce scraping + ingestion + vectorization; le summary restano in Muffin back-office.",
+      "<b>Ambiente di sviluppo</b>: AWS di Exodia, iterazione autonoma prima dell'ingaggio FastWeb.",
+      "<b>Microservizi disaccoppiati</b>: AI service e grants service devono poter operare indipendentemente.",
+      "<b>Sincronizzazione dati</b>: via dump periodico, non API live iniziale (riduce rischio e complessità).",
+      "<b>API keys</b>: Gemini e Claude forniti da Muffin con cap iniziali (200 credit lines per sviluppo).",
+      "<b>Focus priorità</b>: ~10-20 bandi major (es. iperammortamento, SIMEST) generano la maggior parte del valore.",
+    ],
+  },
+];
+
+/* ============================================================
+   RENDER
+   ============================================================ */
+const fmt = (iso) => {
+  const [y,m,d] = iso.split("-");
+  const months = ["gen","feb","mar","apr","mag","giu","lug","ago","set","ott","nov","dic"];
+  return `${d} ${months[+m-1]} ${y.slice(2)}`;
+};
+
+document.getElementById("last-update").textContent = `Ultimo aggiornamento · ${fmt(LAST_UPDATE)}`;
+
+const section = (label, items) => {
+  if (!items || items.length === 0) return "";
+  return `
+    <div class="section">
+      <h4>${label}</h4>
+      <ul>${items.map(i => `<li>${i}</li>`).join("")}</ul>
+    </div>`;
+};
+
+const html = SESSIONS.map((s, idx) => `
+  <div class="session ${s.latest ? 'latest' : ''}">
+    <details class="card" ${idx === 0 ? 'open' : ''}>
+      <summary>
+        <span class="date">${fmt(s.date)}</span>
+        <div class="head">
+          <div class="title">${s.title}</div>
+          ${s.subtitle ? `<div class="sub">${s.subtitle}</div>` : ''}
+        </div>
+        <span class="chev">▸</span>
+      </summary>
+      <div class="body">
+        ${s.summary ? `<p class="lead">${s.summary}</p>` : ''}
+        ${s.placeholder ? `<div class="placeholder">⏳ ${s.placeholder}</div>` : ''}
+        ${s.recording ? `<div class="recording"><span class="recording-label">Registrazione</span><a href="${s.recording}" target="_blank" rel="noopener">Apri su Read.ai</a></div>` : ''}
+        ${section("Quadro emerso", s.quadro)}
+        ${section("Decisioni", s.decisioni)}
+      </div>
+    </details>
+  </div>
+`).join("");
+
+document.getElementById("timeline").innerHTML = html;
+</script>
+</body>
+</html>
