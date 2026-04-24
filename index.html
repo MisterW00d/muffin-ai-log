@@ -203,6 +203,36 @@
 const LAST_UPDATE = "2026-04-24";
 
 const SESSIONS = [
+
+{
+    date: "2026-04-24",
+    title: "Allineamento Tecnico Infrastruttura",
+    subtitle: "Internal Muffin × EXODIA",
+    recording: "https://docs.google.com/document/d/1vl_nnYJ0sGvGn40uVptE1DGKJknRmvJUjYJbFRiG9rY/edit?tab=t.78deqediufuo",
+    latest: true,
+    summary: "Definita la strategia di ingaggio con FastWeb (consegna Terraform + istruzioni, no engagement attivo) e stabilito il modello di integrazione tra la piattaforma Muffin e il servizio AI: Muffin come consumer di REST API per la sincronizzazione dei bandi, Exodia come data provider. Ownership delle summary e dei system prompt chiariti, priorità di sviluppo riallineate.",
+    quadro: [
+      "<b>FastWeb</b>: due opzioni sul tavolo — (A) consegnare Terraform già pronto + guida dettagliata per esecuzione via ticket; (B) ingaggio attivo in un \"progetto\" collaborativo. Scelta la <b>opzione A</b> per lo sviluppo.",
+      "<b>Relazione tra piattaforme</b>: Muffin front-end agisce come <i>consumer</i>, il servizio AI Exodia come <i>data provider</i> tramite REST API. Evitata ogni dipendenza diretta tra gli ID dei due sistemi.",
+      "<b>Summary generation</b>: Daniele ha argomentato che tenere le summary lato Muffin permette al team prodotto di mantenere ownership sul formato (ogni cambio altrimenti richiederebbe un ticket a Exodia). Compromesso: Exodia espone <i>entrambe</i> le API (full data + summary), Muffin sceglie in corsa quale usare.",
+      "<b>Trigger dello scraping</b>: deve partire da Muffin (non da lista interna Exodia). Centro Studi indica la URL sorgente del bando, Muffin inizializza lo scrape sulla piattaforma Exodia.",
+      "<b>Chatbot per bando</b>: dipende dall'intero flow (scrape → download → vectorize) già completato. La piattaforma mostrerà il chatbot solo a enrichment avvenuto, idealmente con un <i>badge</i> \"enriched by AI\".",
+      "<b>Due chatbot distinti</b>: uno focalizzato sul singolo bando, uno \"overview\" per ricerca cross-bandi. Sconsigliato mescolare user persona diverse (Centro Studi vs end-user) sullo stesso chatbot.",
+      "<b>MCP server</b>: richiesto contrattualmente, esporrà dati vettorizzati + query base. Mohamed ha segnalato che per produzione un agente purpose-built resta preferibile per latenza e accuratezza.",
+    ],
+    decisioni: [
+      "<b>Priorità di sviluppo</b>: (1) API per creazione automatica bandi, (2) chatbot integration, (3) MCP server.",
+      "<b>UUID per i bandi</b>: Exodia assegna UID ai bandi ricevuti dal dump e li restituisce a Muffin per l'inserimento — evita conflitti di ID incrementali tra microservizi.",
+      "<b>Ownership summary</b>: ogni parte mantiene la propria versione, nessuna sincronizzazione dello schema di summary.",
+      "<b>Chatbot embedding</b>: abbandonato l'approccio iframe, si va verso una <i>library importabile</i> / script moderno per integrazione contestuale con grant ID.",
+      "<b>Scope chatbot v1</b>: solo uso interno Centro Studi. End-user rimandato a v2 con system prompt e context dedicati.",
+      "<b>System prompt</b>: gestiti da Exodia con versioning, modificabili da admin AI (non da Centro Studi). Context injection già attivo per chatbot focused.",
+      "<b>Milestone 1</b>: usa il dump attuale, la sincronizzazione full via API è rimandata a Milestone 2.",
+      "<b>MCP server</b>: esposto per sperimentazione del vectorizer/RAG, non considerato soluzione di produzione.",
+    ],
+  },
+
+
   {
     date: "2026-04-24",
     title: "Allineamento Tecnico Infrastruttura",
